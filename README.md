@@ -16,16 +16,19 @@ How to Install and Run
 Clone the Repository
 
 Bash
+
 git clone https://github.com/your-username/linkedin-connections-dashboard.git
 cd linkedin-connections-dashboard
 Install Dependencies
 
 Bash
+
 npm install
 Build the Extension
 Run the build command in "watch mode". This will create the dist folder and automatically update it whenever you make code changes.
 
 Bash
+
 npm run dev
 Load into Chrome
 
