@@ -1,0 +1,12 @@
+// tsconfig.json
+{
+  "extends": "@tsconfig/svelte/tsconfig.json",
+
+  "compilerOptions": {
+    // This line is the important addition that fixes the "chrome" error
+    "types": ["chrome"]
+  },
+
+  "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.svelte"],
+  "exclude": ["node_modules/**", "public/**"]
+}
