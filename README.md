@@ -1,47 +1,64 @@
 # Svelte + TS + Vite
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+LinkedIn Connections Dashboard 🚀
+A Chrome extension that fetches a user's LinkedIn connections and displays them in a clean, responsive dashboard. Built with Svelte, TypeScript, and TailwindCSS.
 
-## Recommended IDE Setup
+Features
+View Connections: See your network with their profile picture, full name, and occupation.
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+Smart Caching: Connections are cached to provide a fast experience and reduce API calls.
 
-## Need an official Svelte framework?
+Safe API Usage: Leverages the user's existing browser session to securely fetch data without asking for credentials.
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+Built with Modern Tools: Leverages TypeScript for type safety and Svelte for a reactive, performant UI.
 
-## Technical considerations
+How to Install and Run
+Clone the Repository
 
-**Why use this over SvelteKit?**
+Bash
+git clone https://github.com/your-username/linkedin-connections-dashboard.git
+cd linkedin-connections-dashboard
+Install Dependencies
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+Bash
+npm install
+Build the Extension
+Run the build command in "watch mode". This will create the dist folder and automatically update it whenever you make code changes.
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+Bash
+npm run dev
+Load into Chrome
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+Navigate to chrome://extensions in your Chrome browser.
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+Enable Developer mode using the toggle in the top-right corner.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+Click the Load unpacked button.
 
-**Why include `.vscode/extensions.json`?**
+Select the dist folder from this project directory.
 
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
+Pin the extension to your toolbar for easy access.
 
-**Why enable `allowJs` in the TS template?**
+Technical Deep Dive
+How It Works: Reverse-Engineering
+Since LinkedIn does not provide a public API for fetching connections, this extension uses its internal "Voyager" API.
 
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
+I used the browser's Developer Tools (Network tab) to inspect the traffic on the "My Network" page.
 
-**Why is HMR not preserving my local component state?**
+I identified that connection data is fetched from a voyager/api/ endpoint.
 
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
+Authentication is handled by programmatically accessing the browser's cookies for the linkedin.com domain. The JSESSIONID cookie is used as a csrf-token in the request headers, which validates the session and authorizes the API call. This process is handled securely by the extension's background script.
 
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
+Caching Strategy
+To balance data freshness with performance, the extension implements a simple caching mechanism.
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+Storage: It uses chrome.storage.local, which is the standard asynchronous storage for Chrome extensions.
+
+TTL (Time-to-Live): Connection data is cached with a TTL of 10 minutes. When the user opens the popup, the extension first checks for a valid, non-expired cache entry. If found, the data is displayed instantly. Otherwise, a fresh network request is made, and the new data is stored in the cache.
+
+Limitations and Assumptions
+API Fragility: This extension relies on LinkedIn's internal API, which is subject to change without notice. Any changes to the API could potentially break the extension.
+
+Session Requirement: The user must have an active, logged-in session on LinkedIn.com for the extension to be able to fetch data.
+
+Scope: This is a prototype and doesn't include features like pagination for all connections, advanced filtering, or detailed profile views.
